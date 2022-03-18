@@ -1,9 +1,6 @@
 "use strict";
 
-const users={
-    id: ["lsh7569", "lsh75690", "asdf"],
-    password: ["1234", "1234", "123123"],
-};
+const UserStorage = require("../../models/UserStorage");
 
 const output = {
     home: (req, res) => {
@@ -17,9 +14,11 @@ const output = {
 
 const process = {
     login: (req, res) => {
-       const id=req.body.id,
-        password=req.body.password;
-
+       const id=req.body.id;
+       const password=req.body.password;
+      
+       const users = UserStorage.getUsers("id", "password");
+       
        if(users.id.includes(id)){ //DB에 받아온 id가 있으면
            const idx = users.id.indexOf(id);
            if(users.password[idx]===password){
