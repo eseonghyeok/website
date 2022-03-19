@@ -1,14 +1,21 @@
 "user strict";
 
-class UserStorage {
-    static #users={ //은닉화
-        id: ["lsh7569", "lsh75690", "asdf"],
-        password: ["1234", "1234", "123123"],
-        name:["이성혁", "이성혁", "김팀장"],
-    };
+const fs=require("fs").promises;
 
-    static getUsers(...fields){//은닉화 변수를 메서드로 보내기위함
-        const users = this.#users;
+class UserStorage {
+    static #getUserInfo(data, id){
+        const users = JSON.parse(data);
+        const idx = users.id.indexOf(id);
+        const userInfo = Object.keys(users).reduce((newUser, info) => {
+            newUser[info] = users[info][idx];
+            return newUser;     
+        }, {});
+    
+        return userInfo;
+    }
+
+    static getUsers(...fields){
+        // const users = this.#users;
         const newUsers = fields.reduce((newUsers, field) => {
             if(users.hasOwnProperty(field)){
                 newUsers[field] = users[field];
@@ -19,17 +26,15 @@ class UserStorage {
     }
 
     static getUserInfo(id){
-        const users = this.#users;
-        const idx = users.id.indexOf(id);
-        const userInfo = Object.keys(users).reduce((newUser, info) => {
-            newUser[info] = users[info][idx];
-            return newUser;
-        }, {});
-        return userInfo;
+        return fs.readFile("./src/DB/users.json")
+        .then((data) => {
+            return this.#getUserInfo(data, id);        
+        })
+        .catch(console.error);
     }
 
     static save(userInfo){
-        const users = this.#users;
+        //const users = this.#users;
         users.id.push(userInfo.id);
         users.name.push(userInfo.name);
         users.password.push(userInfo.password);
@@ -37,3 +42,4 @@ class UserStorage {
 }
 
 module.exports = UserStorage;
+ 
